@@ -7,7 +7,7 @@ from math import *
 from pymol import cmd
 
 
-def modevectors(first_obj_frame, last_obj_frame, first_state=1, last_state=1, outname="modevectors", head=1.0, tail=0.3, head_length=1.5, headrgb="1.0,1.0,1.0", tailrgb="1.0,1.0,1.0", cutoff=4.0, skip=0, cut=0.5, atom="CA", stat="show", factor=1.0, notail=0):
+def modevectors(first_obj_frame, last_obj_frame, first_state=1, last_state=1, outname="modevectors", head=1.0, tail=0.3, head_length=1.5, headrgb="1.0,1.0,1.0", tailrgb="1.0,1.0,1.0", cutoff=0.0, skip=0, cut=0.5, atom="CA", stat="show", factor=1.0, notail=0):
     """
     Authors Sean Law & Srinivasa
     Michigan State University
@@ -30,7 +30,7 @@ def modevectors(first_obj_frame, last_obj_frame, first_state=1, last_state=1, ou
     head_length              1.5               Float   Length of the arrow head (from the base of the cone to the tip of cone)
     head_rgb                 1.0,1.0,1.0       String  RGB colour for the arrow head.
     tail_rgb                 1.0,1.0,1.0       String  RGB colour for the arrow tail.
-    cutoff                   4.0               Float   Skips mode vectors that do not meet the cutoff distance (in Angstroms).
+    cutoff                   0.0               Float   Skips mode vectors that do not meet the cutoff distance (in Angstroms).
     skip                     0                 Integer Denotes how many atoms to skip.  No arrows will be created for skipped atoms.
     cut                      0.0               Float   Truncates all arrow tail lengths (without disturbing the arrow head) (in Angstroms).
     atom                     CA                String  Designates the atom to derive mode vectors from.
@@ -47,7 +47,7 @@ def modevectors(first_obj_frame, last_obj_frame, first_state=1, last_state=1, ou
     factor = float(factor)
     arrow_head_radius = float(head)
     arrow_tail_radius = float(tail)
-    arrow_head_length = float(head_length)
+    arrow_head_length = -float(head_length)  ### for me the cones were drawn in wrong direction
     cutoff = float(cutoff)
     skip = int(skip)
     cut = float(cut)
@@ -203,12 +203,9 @@ def modevectors(first_obj_frame, last_obj_frame, first_state=1, last_state=1, ou
             cutoff_counter += 1
             continue
         t = 1.0 - (cut / length)
-        x2[mv] = x1[mv] + factor * t * vectorx
-        y2[mv] = y1[mv] + factor * t * vectory
-        z2[mv] = z1[mv] + factor * t * vectorz
-        vectorx = x2[mv] - x1[mv]
-        vectory = y2[mv] - y1[mv]
-        vectorz = z2[mv] - z1[mv]
+        vectorx = vectorx * factor
+        vectory = vectory * factor
+        vectorz = vectorz * factor
         length = sqrt(vectorx ** 2 + vectory ** 2 + vectorz ** 2)
         d = arrow_head_length  # Distance from arrow tip to arrow base
         t = 1.0 - (d / length)
